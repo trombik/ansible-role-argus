@@ -18,9 +18,9 @@
     option: EnvironmentFile
     value: "-/etc/default/argus"
     no_extra_spaces: yes
-  register: __argus_unit_file_environmentfile
   notify:
     - Restart argus_service
+    - Reload systemd
 
 - name: Edit /lib/systemd/system/argus.service (ExecStart)
   # XXX the unit file does not support /etc/default/argus
@@ -30,15 +30,9 @@
     option: ExecStart
     value: "/usr/sbin/argus $ARGUS_OPTIONS"
     no_extra_spaces: yes
-  register: __argus_unit_file_execstart
   notify:
     - Restart argus_service
-
-- name: Reload systemd
-  systemd:
-    daemon_reload: yes
-  when:
-    - __argus_unit_file_execstart.changed or __argus_unit_file_environmentfile.changed
+    - Reload systemd
 
 - name: Enable argus_service
   service:
