@@ -1,0 +1,13 @@
+---
+
+argus_package: "{{ __argus_package }}"
+argus_service: "{{ __argus_service }}"
+argus_extra_packages: []
+argus_user: "{{ __argus_user }}"
+argus_group: "{{ __argus_group }}"
+argus_extra_groups: []
+argus_log_dir: "{{ __argus_log_dir }}"
+argus_config_dir: "{{ __argus_config_dir }}"
+argus_config_file: "{{ argus_config_dir }}/argus.conf"
+argus_config: ""
+argus_flags: ""

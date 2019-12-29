@@ -1,0 +1,19 @@
+---
+
+- name: Install argus_extra_packages
+  openbsd_pkg:
+    name: "{{ argus_extra_packages }}"
+    state: present
+
+- name: Install argus_package
+  openbsd_pkg:
+    name: "{{ argus_package }}"
+    state: present
+
+- name: Enable argus_service
+  service:
+    name: "{{ argus_service }}"
+    arguments: "{{ argus_flags }}"
+    enabled: yes
+  notify:
+    - Restart argus_service

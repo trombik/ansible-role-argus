@@ -1,0 +1,6 @@
+---
+
+- name: Restart argus_service
+  service:
+    name: "{{ argus_service }}"
+    state: restarted

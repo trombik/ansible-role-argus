@@ -1,0 +1,42 @@
+---
+
+- name: "Include vars/{{ ansible_os_family }}.yml"
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: "Include install-{{ ansible_os_family }}.yml"
+  include: "install-{{ ansible_os_family }}.yml"
+
+- name: "Create {{ argus_config_dir }}"
+  file:
+    path: "{{ argus_config_dir }}"
+    state: directory
+
+- name: "Create {{ argus_config_file }}"
+  template:
+    src: argus.conf.j2
+    owner: "{{ argus_user }}"
+    group: "{{ argus_group }}"
+    dest: "{{ argus_config_file }}"
+    mode: '0640'
+  notify:
+    - Restart argus_service
+
+- name: "Add argus_user to argus_extra_groups"
+  user:
+    name: "{{ argus_user }}"
+    append: yes
+    create_home: no
+    groups: "{{ argus_extra_groups }}"
+
+- name: Create argus_log_dir
+  file:
+    path: "{{ argus_log_dir }}"
+    owner: "{{ argus_user }}"
+    group: "{{ argus_group }}"
+    mode: 0755
+    state: directory
+
+- name: Start argus_service
+  service:
+    name: "{{ argus_service }}"
+    state: started

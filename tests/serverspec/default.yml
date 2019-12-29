@@ -1,0 +1,72 @@
+---
+- hosts: localhost
+  roles:
+    - role: trombik.redhat_repo
+      when:
+        - ansible_os_family == 'RedHat'
+    - name: trombik.argus_clients
+    - name: ansible-role-argus
+  pre_tasks:
+    - name: Dump all hostvars
+      debug:
+        var: hostvars[inventory_hostname]
+  post_tasks:
+    - name: List all services (systemd)
+      # workaround ansible-lint: [303] service used in place of service module
+      shell: "echo; systemctl list-units --type service"
+      changed_when: false
+      when:
+        # in docker, init is not systemd
+        - ansible_virtualization_type != 'docker'
+        - ansible_os_family == 'RedHat' or ansible_os_family == 'Debian'
+    - name: list all services (FreeBSD service)
+      # workaround ansible-lint: [303] service used in place of service module
+      shell: "echo; service -l"
+      changed_when: false
+      when:
+        - ansible_os_family == 'FreeBSD'
+  vars:
+    os_argus_flags:
+      OpenBSD: "-F {{ argus_config_file }}"
+      FreeBSD: |
+        argus_flags='-F {{ argus_config_file }}'
+        argus_pidfile='/var/run/argus.{{ ansible_default_ipv4.device | default(omit) }}.*.pid'
+      Debian: |
+        ARGUS_OPTIONS="-F {{ argus_config_file }}"
+      RedHat: |
+        ARGUS_OPTIONS="-F {{ argus_config_file }}"
+    argus_flags: "{{ os_argus_flags[ansible_os_family] }}"
+    argus_extra_groups:
+      - bin
+    os_interface:
+      FreeBSD: em0
+      OpenBSD: em0
+      Debian: eth0
+      RedHat: eth0
+    argus_config: |
+      ARGUS_FLOW_TYPE="Bidirectional"
+      ARGUS_FLOW_KEY="CLASSIC_5_TUPLE"
+      {% if ansible_os_family != 'Debian' and ansible_os_family != 'RedHat' %}
+      # XXX the unit file expects the command not to fork
+      ARGUS_DAEMON=yes
+      {% endif %}
+      ARGUS_ACCESS_PORT=561
+      ARGUS_BIND_IP="127.0.0.1"
+      ARGUS_INTERFACE={{ os_interface[ansible_os_family] }}
+      ARGUS_GO_PROMISCUOUS=yes
+      ARGUS_SETUSER_ID={{ argus_user }}
+      ARGUS_SETGROUP_ID={{ argus_group }}
+      ARGUS_OUTPUT_FILE={{ argus_log_dir}}/argus.ra
+      ARGUS_FLOW_STATUS_INTERVAL=60
+      ARGUS_MAR_STATUS_INTERVAL=300
+      ARGUS_DEBUG_LEVEL=1
+      ARGUS_FILTER="ip"
+      ARGUS_SET_PID=yes
+      ARGUS_PID_PATH=/var/run
+    redhat_repo_extra_packages:
+      - epel-release
+    redhat_repo:
+      epel:
+        mirrorlist: "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-{{ ansible_distribution_major_version }}&arch={{ ansible_architecture }}"
+        gpgcheck: yes
+        enabled: yes
