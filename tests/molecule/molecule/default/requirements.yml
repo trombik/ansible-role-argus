@@ -1,2 +1,5 @@
 ---
-[]
+- name: trombik.argus_clients
+- name: trombik.redhat_repo
+- name: trombik.cyrus_sasl
+- name: trombik.freebsd_pkg_repo
