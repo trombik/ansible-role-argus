@@ -1,6 +1,6 @@
 # `trombik.argus`
 
-[![Build Status](https://travis-ci.com/trombik/trombik.argus.svg?branch=master)](https://travis-ci.com/trombik/trombik.argus)
+[![Build Status](https://travis-ci.com/trombik/ansible-role-argus.svg?branch=master)](https://travis-ci.com/trombik/ansible-role-argus)
 
 `ansible` role for `argus`.
 
