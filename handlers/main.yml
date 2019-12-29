@@ -4,3 +4,7 @@
   service:
     name: "{{ argus_service }}"
     state: restarted
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
