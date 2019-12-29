@@ -27,29 +27,101 @@
       when:
         - ansible_os_family == 'OpenBSD'
   roles:
-    - role: docker
+    - role: trombik.freebsd_pkg_repo
+      when: ansible_os_family == "FreeBSD"
+    - name: trombik.redhat_repo
       when:
-        - ansible_virtualization_type == 'docker'
-    - role: trombik.template_role
+        - ansible_os_family == 'RedHat'
+    - name: trombik.argus_clients
+    - name: ansible-role-argus
+    - name: trombik.cyrus_sasl
+    - name: rarc
   vars:
-    os_template_role_flags:
-      OpenBSD: -4
-      FreeBSD: ""
-      Debian: ""
-      RedHat: ""
-
-    # on RedHat, non-default port is not allowed to listen on
-    # on FreeBSD, sshd from the base and one from the package are both running
-    os_ports:
-      OpenBSD: [22, 10022]
-      FreeBSD: [10022]
-      Debian: [22, 10022]
-      RedHat: [22]
-    template_role_flags: "{{ os_template_role_flags[ansible_os_family] }}"
-    template_role_extra_groups:
+    os_argus_flags:
+      OpenBSD: "-F {{ argus_config_file }}"
+      FreeBSD: |
+        argus_flags='-F {{ argus_config_file }}'
+        argus_pidfile='/var/run/argus.{{ ansible_default_ipv4.device | default(omit) }}.*.pid'
+      Debian: |
+        ARGUS_OPTIONS="-F {{ argus_config_file }}"
+      RedHat: |
+        ARGUS_OPTIONS="-F {{ argus_config_file }}"
+    argus_flags: "{{ os_argus_flags[ansible_os_family] }}"
+    argus_extra_groups:
       - bin
-    template_role_config: |
-      UseDNS no
-      {% for p in os_ports[ansible_os_family] %}
-      Port {{ p }}
-      {% endfor %}
+    os_interface:
+      FreeBSD: em0
+      OpenBSD: em0
+      Debian: eth0
+      RedHat: eth0
+    argus_config: |
+      ARGUS_FLOW_TYPE="Bidirectional"
+      ARGUS_FLOW_KEY="CLASSIC_5_TUPLE"
+      ARGUS_ACCESS_PORT=561
+      ARGUS_BIND_IP="127.0.0.1"
+      ARGUS_INTERFACE={{ os_interface[ansible_os_family] }}
+      ARGUS_GO_PROMISCUOUS=yes
+      ARGUS_SETUSER_ID={{ argus_user }}
+      ARGUS_SETGROUP_ID={{ argus_group }}
+      ARGUS_OUTPUT_FILE={{ argus_log_dir }}/argus.ra
+      ARGUS_FLOW_STATUS_INTERVAL=60
+      ARGUS_MAR_STATUS_INTERVAL=300
+      ARGUS_DEBUG_LEVEL=1
+      ARGUS_FILTER="ip"
+      ARGUS_SET_PID=yes
+      ARGUS_PID_PATH=/var/run
+      ARGUS_MIN_SSF=40
+      ARGUS_MAX_SSF=128
+      {% if ansible_os_family != 'Debian' and ansible_os_family != 'RedHat' %}
+      ARGUS_DAEMON=yes
+      {% else %}
+      # XXX the unit file expects the command not to fork
+      ARGUS_DAEMON=no
+      {% endif %}
+    redhat_repo_extra_packages:
+      - epel-release
+    redhat_repo:
+      epel:
+        mirrorlist: "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-{{ ansible_distribution_major_version }}&arch={{ ansible_architecture }}"
+        gpgcheck: yes
+        enabled: yes
+    # __________________________________sasl
+    cyrus_sasl_user:
+      foo:
+        domain: ''
+        password: password
+        appname: argus
+        state: present
+    cyrus_sasl_config:
+      argus:
+        pwcheck_method: auxprop
+        auxprop_plugin: sasldb
+        mech_list: DIGEST-MD5
+    cyrus_sasl_sasldb_group: "{{ argus_group }}"
+    cyrus_sasl_sasldb_file_permission: "0640"
+
+    os_cyrus_sasl_saslauthd_flags:
+      FreeBSD: |
+        saslauthd_flags="-a pam -n 6"
+      OpenBSD: "-a getpwent -n 6"
+      RedHat: |
+        SOCKETDIR="/run/saslauthd"
+        MECH="pam"
+        FLAGS="-n 6"
+      Debian: |
+        START=yes
+        DESC="SASL Authentication Daemon"
+        NAME="saslauthd"
+        THREADS="6"
+        MECHANISMS="pam"
+        MECH_OPTIONS=""
+        OPTIONS="-c -m /var/run/saslauthd"
+    cyrus_sasl_saslauthd_flags: "{{ os_cyrus_sasl_saslauthd_flags[ansible_os_family] }}"
+
+    freebsd_pkg_repo:
+      local:
+        enabled: "false"
+        url: http://192.168.1.60/packages/120amd64-trombik/
+        mirror_type: none
+        priority: 100
+        state: present

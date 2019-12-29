@@ -1,0 +1,10 @@
+---
+
+- name: Create .rarc
+  copy:
+    content: |
+      RA_MIN_SSF=40
+      RA_MAX_SSF=128
+      RA_USER_AUTH="foo"
+      RA_AUTH_PASS="password"
+    dest: /home/vagrant/.rarc
