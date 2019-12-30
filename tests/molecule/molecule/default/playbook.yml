@@ -32,6 +32,9 @@
     - name: trombik.redhat_repo
       when:
         - ansible_os_family == 'RedHat'
+    - name: docker
+      when:
+        - ansible_virtualization_type == 'docker'
     - name: trombik.argus_clients
     - name: ansible-role-argus
     - name: trombik.cyrus_sasl
