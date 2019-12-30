@@ -6,11 +6,6 @@
 - name: "Include install-{{ ansible_os_family }}.yml"
   include: "install-{{ ansible_os_family }}.yml"
 
-- name: "Create {{ argus_config_dir }}"
-  file:
-    path: "{{ argus_config_dir }}"
-    state: directory
-
 - name: "Create {{ argus_config_file }}"
   template:
     src: argus.conf.j2

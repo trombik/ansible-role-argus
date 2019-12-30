@@ -1,7 +1,7 @@
 ---
 __argus_service: argus
 __argus_package: net-mgmt/argus3
-__argus_config_dir: /usr/local/etc/argus
+__argus_config_dir: /usr/local/etc
 __argus_user: argus
 __argus_group: argus
 __argus_log_dir: /var/log/argus
