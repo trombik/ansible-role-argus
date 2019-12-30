@@ -85,6 +85,6 @@ def test_port(host):
 
 def test_ra(host):
     with host.sudo():
-        # read IP records from argus on localhost:561 for 1 sec.
-        cmd = host.run("ra -S localhost -T 1 ip")
+        # read one IP record from argus on localhost:561
+        cmd = host.run("ra -S localhost -N 1 ip")
         assert cmd.succeeded

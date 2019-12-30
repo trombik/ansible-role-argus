@@ -44,7 +44,7 @@
       OpenBSD: "-F {{ argus_config_file }}"
       FreeBSD: |
         argus_flags='-F {{ argus_config_file }}'
-        argus_pidfile='/var/run/argus.{{ ansible_default_ipv4.device | default(omit) }}.*.pid'
+        argus_pidfile='/var/run/argus.*.*.pid'
       Debian: |
         ARGUS_OPTIONS="-F {{ argus_config_file }}"
       RedHat: |
@@ -52,20 +52,28 @@
     argus_flags: "{{ os_argus_flags[ansible_os_family] }}"
     argus_extra_groups:
       - bin
-    os_interface:
-      FreeBSD: em0
-      OpenBSD: em0
-      Debian: eth0
-      RedHat: eth0
+    os_interfaces:
+      FreeBSD: "ind:em0,em1"
+      OpenBSD: "ind:em0,em1"
+      Debian: "ind:eth0,eth1"
+      RedHat: "ind:eth0,eth1"
     argus_config: |
       ARGUS_FLOW_TYPE="Bidirectional"
       ARGUS_FLOW_KEY="CLASSIC_5_TUPLE"
       ARGUS_ACCESS_PORT=561
       ARGUS_BIND_IP="127.0.0.1"
-      ARGUS_INTERFACE={{ os_interface[ansible_os_family] }}
+      # XXX argus silently exits on some combinations of ARGUS_INTERFACE. the
+      # man page is very ambiguous abouth its format, and what works or not
+      # depends on the OS.
+      ARGUS_INTERFACE={{ os_interfaces[ansible_os_family] }}
       ARGUS_GO_PROMISCUOUS=yes
-      ARGUS_SETUSER_ID={{ argus_user }}
-      ARGUS_SETGROUP_ID={{ argus_group }}
+      # XXX disable setuid()
+      # argus exits with `ArgusOpenInterface em0: (cannot open device)
+      # /dev/bpf: Permission denied` when ARGUS_INTERFACE has multiple
+      # interfaces.
+      #
+      # ARGUS_SETUSER_ID={{ argus_user }}
+      # ARGUS_SETGROUP_ID={{ argus_group }}
       ARGUS_OUTPUT_FILE={{ argus_log_dir }}/argus.ra
       ARGUS_FLOW_STATUS_INTERVAL=60
       ARGUS_MAR_STATUS_INTERVAL=300
