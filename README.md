@@ -6,10 +6,6 @@
 
 ## Notes for all users
 
-The default path of the official package to `argus.conf(5)` is either
-`/etc/argus.conf`, or `/usr/local/etc/argus.conf`, but this role defaults to
-`/etc/argus/argus.conf`, or`/usr/local/etc/argus/argus.conf`.
-
 The role assumes that the path to log directory, where captured `ra` file is
 recorded, is `/var/log/argus`, and it is owned by `argus` user.
 
@@ -54,7 +50,7 @@ passed to `rcctl set argus`.
 |----------|---------|
 | `__argus_service` | `argus` |
 | `__argus_package` | `argus-server` |
-| `__argus_config_dir` | `/etc/argus` |
+| `__argus_config_dir` | `/etc` |
 | `__argus_user` | `argus` |
 | `__argus_group` | `argus` |
 | `__argus_log_dir` | `/var/log/argus` |
@@ -65,7 +61,7 @@ passed to `rcctl set argus`.
 |----------|---------|
 | `__argus_service` | `argus` |
 | `__argus_package` | `net-mgmt/argus3` |
-| `__argus_config_dir` | `/usr/local/etc/argus` |
+| `__argus_config_dir` | `/usr/local/etc` |
 | `__argus_user` | `argus` |
 | `__argus_group` | `argus` |
 | `__argus_log_dir` | `/var/log/argus` |
@@ -76,7 +72,7 @@ passed to `rcctl set argus`.
 |----------|---------|
 | `__argus_service` | `argus` |
 | `__argus_package` | `argus` |
-| `__argus_config_dir` | `/etc/argus` |
+| `__argus_config_dir` | `/etc` |
 | `__argus_user` | `_argus` |
 | `__argus_group` | `_argus` |
 | `__argus_log_dir` | `/var/log/argus` |
@@ -87,11 +83,10 @@ passed to `rcctl set argus`.
 |----------|---------|
 | `__argus_service` | `argus` |
 | `__argus_package` | `argus` |
-| `__argus_config_dir` | `/etc/argus` |
+| `__argus_config_dir` | `/etc` |
 | `__argus_user` | `argus` |
 | `__argus_group` | `argus` |
 | `__argus_log_dir` | `/var/log/argus` |
-
 
 # Dependencies
 
