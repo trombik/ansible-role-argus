@@ -81,3 +81,9 @@ def test_port(host):
 
     for p in ports:
         assert host.socket("tcp://127.0.0.1:%d" % p).is_listening
+
+
+def test_ra(host):
+    with host.sudo():
+        cmd = host.run("ra -S localhost -N 1 ip")
+        assert cmd.succeeded

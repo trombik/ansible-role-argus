@@ -121,7 +121,7 @@
     freebsd_pkg_repo:
       local:
         enabled: "true"
-        url: http://192.168.1.60/packages/120amd64-trombik/
+        url: http://10.112.254.96/packages/120amd64-trombik/
         mirror_type: none
         priority: 100
         state: present

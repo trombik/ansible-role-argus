@@ -1,10 +1,16 @@
 ---
 
 - name: Create .rarc
+  # XXX Create .rarc for root user.
+  #
+  # argus support site-wide configuration as /etc/ra.conf, but it does not
+  # read files and override configurations, i.e. when it finds /root/.rarc, it
+  # does not read /etc/ra.conf, and you cannot have `RA_MIN_SSF` in a file,
+  # and `RA_USER_AUTH` in the other. also, /etc/ra.conf is hard-coded.
   copy:
     content: |
       RA_MIN_SSF=40
       RA_MAX_SSF=128
       RA_USER_AUTH="foo@trombik.org"
       RA_AUTH_PASS="password"
-    dest: /home/vagrant/.rarc
+    dest: /root/.rarc
