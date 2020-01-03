@@ -110,7 +110,7 @@ when "redhat"
   describe file("/usr/lib/sasl2") do
     it { should exist }
     it { should be_symlink }
-    it { should be_linked_to '/usr/lib64/sasl2' }
+    it { should be_linked_to "/usr/lib64/sasl2" }
   end
 when "ubuntu"
   describe file("/lib/systemd/system/argus.service") do
