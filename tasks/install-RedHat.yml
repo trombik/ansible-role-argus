@@ -10,6 +10,15 @@
     name: "{{ argus_package }}"
     state: present
 
+- name: Create symlink to /usr/lib64/sasl2
+  # XXX the package has compiled with a fixed path to sasl2
+  file:
+    src: /usr/lib64/sasl2
+    dest: /usr/lib/sasl2
+    state: link
+  when:
+    - ansible_userspace_bits == "64"
+
 - name: Edit /usr/lib/systemd/system/argus.service (EnvironmentFile)
   # XXX the unit file does not support /etc/sysconfig/argus
   ini_file:
