@@ -3,7 +3,7 @@ require "serverspec"
 
 package = "argus"
 service = "argus"
-config_dir = "/etc/argus"
+config_dir = "/etc"
 config_mode = 640
 user = "argus"
 group = "argus"
@@ -24,7 +24,7 @@ when "openbsd"
   group = "_argus"
 when "freebsd"
   package = "argus-sasl"
-  config_dir = "/usr/local/etc/argus"
+  config_dir = "/usr/local/etc"
 when "ubuntu"
   default_group = "root"
   package = "argus-server"
@@ -105,6 +105,12 @@ when "redhat"
   describe file("/usr/lib/systemd/system/argus.service") do
     its(:content) { should match(Regexp.escape("ExecStart=/usr/sbin/argus $ARGUS_OPTIONS")) }
     its(:content) { should match(Regexp.escape("EnvironmentFile=-/etc/sysconfig/argus")) }
+  end
+
+  describe file("/usr/lib/sasl2") do
+    it { should exist }
+    it { should be_symlink }
+    it { should be_linked_to '/usr/lib64/sasl2' }
   end
 when "ubuntu"
   describe file("/lib/systemd/system/argus.service") do
